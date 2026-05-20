@@ -45,7 +45,7 @@ SMM Radar is a microservice platform for social media monitoring, sentiment anal
 ## Local run
 
 ```bash
-cd d:\Шарага\Кинжа9\Task_23_SMMRadar
+cd 'your/project/folder'
 docker compose up --build -d
 ```
 
