@@ -1,0 +1,178 @@
+﻿services:
+  api-gateway:
+    build:
+      context: .
+      dockerfile: api-gateway/Dockerfile
+    container_name: smmradar-api-gateway
+    env_file: .env
+    ports:
+      - "31051:8500"
+    depends_on:
+      - collector-service
+      - nlp-service
+      - analytics-service
+      - alert-service
+      - competitor-service
+      - report-service
+      - notification-service
+    networks: [smmradar-net]
+
+  collector-service:
+    build:
+      context: .
+      dockerfile: collector-service/Dockerfile
+    container_name: smmradar-collector
+    env_file: .env
+    ports:
+      - "31049:8501"
+    depends_on:
+      - mongodb
+      - rabbitmq
+    networks: [smmradar-net]
+
+  nlp-service:
+    build:
+      context: .
+      dockerfile: nlp-service/Dockerfile
+    container_name: smmradar-nlp
+    env_file: .env
+    ports:
+      - "32035:8502"
+    depends_on:
+      - redis
+    networks: [smmradar-net]
+
+  analytics-service:
+    build:
+      context: .
+      dockerfile: analytics-service/Dockerfile
+    container_name: smmradar-analytics
+    env_file: .env
+    ports:
+      - "31048:8503"
+    depends_on:
+      - postgres
+      - elasticsearch
+      - redis
+    networks: [smmradar-net]
+
+  alert-service:
+    build:
+      context: .
+      dockerfile: alert-service/Dockerfile
+    container_name: smmradar-alert
+    env_file: .env
+    ports:
+      - "32036:8504"
+    depends_on:
+      - redis
+    networks: [smmradar-net]
+
+  competitor-service:
+    build:
+      context: .
+      dockerfile: competitor-service/Dockerfile
+    container_name: smmradar-competitor
+    env_file: .env
+    ports:
+      - "31046:8505"
+    depends_on:
+      - postgres
+    networks: [smmradar-net]
+
+  report-service:
+    build:
+      context: .
+      dockerfile: report-service/Dockerfile
+    container_name: smmradar-report
+    env_file: .env
+    ports:
+      - "31044:8506"
+    depends_on:
+      - postgres
+    networks: [smmradar-net]
+
+  notification-service:
+    build:
+      context: .
+      dockerfile: notification-service/Dockerfile
+    container_name: smmradar-notification
+    env_file: .env
+    ports:
+      - "31045:8507"
+    depends_on:
+      - redis
+    networks: [smmradar-net]
+
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+      args:
+        VITE_API_GATEWAY_URL: ${VITE_API_GATEWAY_URL:-http://localhost:31051}
+    container_name: smmradar-frontend
+    env_file: .env
+    ports:
+      - "5183:5183"
+    depends_on:
+      - api-gateway
+    networks: [smmradar-net]
+
+  postgres:
+    image: postgres:16
+    container_name: smmradar-postgres
+    environment:
+      POSTGRES_DB: smmradar
+      POSTGRES_USER: smmradar
+      POSTGRES_PASSWORD: smmradar
+    ports:
+      - "55440:5432"
+    volumes:
+      - smmradar_postgres_data:/var/lib/postgresql/data
+    networks: [smmradar-net]
+
+  mongodb:
+    image: mongo:7
+    container_name: smmradar-mongodb
+    ports:
+      - "30005:27017"
+    volumes:
+      - smmradar_mongodb_data:/data/db
+    networks: [smmradar-net]
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.14.3
+    container_name: smmradar-elasticsearch
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - ES_JAVA_OPTS=-Xms512m -Xmx512m
+    ports:
+      - "9208:9200"
+    volumes:
+      - smmradar_es_data:/usr/share/elasticsearch/data
+    networks: [smmradar-net]
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: smmradar-rabbitmq
+    ports:
+      - "31047:5672"
+      - "31050:15672"
+    networks: [smmradar-net]
+
+  redis:
+    image: redis:7
+    container_name: smmradar-redis
+    ports:
+      - "6388:6379"
+    networks: [smmradar-net]
+
+networks:
+  smmradar-net:
+    driver: bridge
+
+volumes:
+  smmradar_postgres_data:
+  smmradar_mongodb_data:
+  smmradar_es_data:
