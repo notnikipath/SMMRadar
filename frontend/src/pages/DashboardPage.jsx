@@ -91,7 +91,7 @@ export function DashboardPage() {
       <header className="hero">
         <div>
           <p className="eyebrow">SMM Radar</p>
-          <h1>Social signal observability for brand reputation and competitor pressure.</h1>
+          <h1>Social intelligence</h1>
           <p className="sub">
             Unified monitoring across VK, Telegram, YouTube, Twitter, Instagram, Facebook, and Rutube.
           </p>

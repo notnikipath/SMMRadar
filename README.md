@@ -1,4 +1,4 @@
-﻿# SMM Radar
+# SMM Radar
 
 SMM Radar is a microservice platform for social media monitoring, sentiment analytics, trend detection, competitor analysis, and reporting.
 
@@ -45,7 +45,7 @@ SMM Radar is a microservice platform for social media monitoring, sentiment anal
 ## Local run
 
 ```bash
-cd 'your/project/folder'
+cd SMMRadar
 docker compose up --build -d
 ```
 
