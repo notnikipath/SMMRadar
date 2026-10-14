@@ -1,4 +1,4 @@
-﻿name: SMM Radar CI
+name: SMM Radar CI
 
 on:
   push:
@@ -29,4 +29,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Validate compose
-        run: docker compose config
+        run: |
+          cp .env.example .env
+          docker compose config --quiet
